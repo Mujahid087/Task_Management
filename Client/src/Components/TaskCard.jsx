@@ -25,6 +25,9 @@ const TaskCard = ({ task }) => {
   const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
 
+
+  
+
   return (
     <>
       <div className='w-full h-fit bg-white shadow-md p-4 rounded'>

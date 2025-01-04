@@ -9,6 +9,8 @@ import { Menu, Transition } from "@headlessui/react";
 import AddTask from "./AddTask";
 import AddSubTask from "./AddSubTask";
 import ConfirmatioDialog from "../Dialogs";
+import { useTrashTaskMutation ,  useDuplicateTaskMutation } from "../../redux/slices/api/TaskApiSlice";
+import { toast } from "react-toastify";
 
 const TaskDialog = ({ task }) => {
   const [open, setOpen] = useState(false);
@@ -16,10 +18,46 @@ const TaskDialog = ({ task }) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const navigate = useNavigate();
+  const [deleteTask]=useTrashTaskMutation();
+  const [duplicateTask]=useDuplicateTaskMutation();
 
-  const duplicateHandler = () => {};
-  const deleteClicks = () => {};
-  const deleteHandler = () => {};
+
+  const duplicateHandler = async () => {
+     try{
+      const res=await duplicateTask(task._id).unwrap()
+      toast.success(res?.message)
+
+      setTimeout(()=>{
+        setOpenDialog(false)
+        window.location.reload();
+      },500)
+     }catch(err){
+      console.log(err)
+      toast.error(err?.data?.message || err.error)
+     }
+  };
+
+  const deleteClicks = () => {
+    setOpenDialog(true)
+  };
+
+  const deleteHandler =async () => {
+    try{
+      const res=await deleteTask({
+        id:task._id,
+        isTrashed:"trash",
+      }).unwrap();
+      toast.success(res?.message)
+      setTimeout(()=>{
+        setOpenDialog(false)
+        window.location.reload()
+      },500)
+    }catch(error){
+      console.log(error);
+      toast.error(error?.data?.message || error.error)
+    }
+
+  };
 
   const items = [
     {
@@ -40,7 +78,8 @@ const TaskDialog = ({ task }) => {
     {
       label: "Duplicate",
       icon: <HiDuplicate className='mr-2 h-5 w-5' aria-hidden='true' />,
-      onClick: () => duplicateHanlder(),
+      onClick: () => duplicateHandler(),
+      // onclick : ()=>duplicateHandler(),
     },
   ];
 
