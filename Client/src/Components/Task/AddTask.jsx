@@ -11,16 +11,29 @@ import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/
 import { app } from "../../utils/firebase";
 import { useCreateTaskMutation, useUpdateTaskMutation } from "../../redux/slices/api/TaskApiSlice";
 import { toast } from "react-toastify";
+import { dateFormatter } from "../../utils";
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORITY = ["HIGH", "MEDIUM", "NORMAL", "LOW"];
 
 const AddTask = ({ open, setOpen, task }) => {
+
+  const defaultValues={
+    title:task?.title || "",
+    date:dateFormatter(task?.date || new Date()),
+    team:[],
+    stage:"",
+    priority:"",
+    assets:[],
+
+  }
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm(defaultValues);
+
+  
   const [team, setTeam] = useState(task?.team || []);
   const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0]);
   const [priority, setPriority] = useState(task?.priority?.toUpperCase() || PRIORITY[2]);
