@@ -8,6 +8,8 @@ export const formatDate = (date) => {
   
     return formattedDate;
   };
+
+
   
   export function dateFormatter(dateString) {
     const inputDate = new Date(dateString);
@@ -23,7 +25,7 @@ export const formatDate = (date) => {
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
   }
-  
+ 
   // export function getInitials(fullName) {
   //   const names = fullName.split(" ");
   
