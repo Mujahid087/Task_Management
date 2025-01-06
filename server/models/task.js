@@ -37,7 +37,7 @@ const taskSchema = new Schema({
     subTasks:[
         {
             title:String,
-            data:Date,
+            date:Date,
             tag:String
         },
 
