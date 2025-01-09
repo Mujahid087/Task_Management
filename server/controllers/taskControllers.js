@@ -52,72 +52,28 @@ export const createTask = async (req, res) => {
   }
 };
 
-// export const duplicateTask = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const task = await Task.findById(id);
-
-//     const newTask = await Task.create({
-//       ...task,
-//       title: task.title + " - Duplicate",
-//     });
-
-//     newTask.team = task.team;
-//     newTask.subTasks = task.subTasks;
-//     newTask.assets = task.assets;
-//     newTask.priority = task.priority;
-//     newTask.stage = task.stage;
-
-//     await newTask.save();
-
-//     //alert users of the task
-//     let text = "New task has been assigned to you";
-//     if (task.team.length > 1) {
-//       text = text + ` and ${task.team.length - 1} others.`;
-//     }
-
-//     text =
-//       text +
-//       ` The task priority is set a ${
-//         task.priority
-//       } priority, so check and act accordingly. The task date is ${task.date.toDateString()}. Thank you!!!`;
-
-//     await Notice.create({
-//       team: task.team,
-//       text,
-//       task: newTask._id,
-//     });
-
-//     res
-//       .status(200)
-//       .json({ status: true, message: "Task duplicated successfully." });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(400).json({ status: false, message: error.message });
-//   }
-// };
 
 export const duplicateTask = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Find the original task
     const task = await Task.findById(id);
     if (!task) {
       return res.status(404).json({ status: false, message: "Task not found." });
     }
 
+    // Prepare the new task data
+    const taskData = task.toObject();
+    delete taskData._id; // Remove the _id field to avoid duplicate key error
+
+    // Customize fields for the new task
     const newTask = await Task.create({
-      ...task.toObject(),
+      ...taskData,
       title: task.title + " - Duplicate",
-      team: task.team,
-      subTasks: task.subTasks,
-      assets: task.assets,
-      priority: task.priority,
-      stage: task.stage,
     });
 
-    // Alert users of the task
+    // Prepare alert text for the team
     let text = "New task has been assigned to you";
     if (task.team.length > 1) {
       text += ` and ${task.team.length - 1} others.`;
@@ -126,16 +82,18 @@ export const duplicateTask = async (req, res) => {
     const taskDate = task.date ? new Date(task.date).toDateString() : "N/A";
     text += ` The task priority is set at ${task.priority} priority, so check and act accordingly. The task date is ${taskDate}. Thank you!!!`;
 
+    // Create a notice for the team
     await Notice.create({
       team: task.team,
       text,
-      task: newTask._id,
+      task: newTask._id, // Link the new task
     });
 
+    // Respond with success
     res.status(200).json({ status: true, message: "Task duplicated successfully." });
   } catch (error) {
     console.error("Error duplicating task:", error);
-    return res.status(400).json({ status: false, message: error.message });
+    res.status(400).json({ status: false, message: error.message });
   }
 };
 
