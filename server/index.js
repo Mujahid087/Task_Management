@@ -33,7 +33,11 @@ app.use("/api",routes)
 app.get('/test', (req, res) => {
     res.json({ message: 'Server is working' })
 })
-
+app.use((req, res, next) => {
+    console.log(`Request Params:`, req.params);
+    next();
+  });
+  
 app.use(routeNotFound)
 app.use(errorHandler)
 

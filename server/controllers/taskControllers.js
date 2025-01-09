@@ -1,6 +1,7 @@
 import Notice from "../models/notification.js";
 import Task from "../models/task.js";
 import User from "../models/user.js";
+import mongoose from "mongoose";
 import {protectRoute,isAdminRoute} from "../middlewares/authMiddleware.js"
 
 export const createTask = async (req, res) => {
@@ -228,10 +229,43 @@ export const getTasks = async (req, res) => {
   }
 };
 
+// export const getTask = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const task = await Task.findById(id)
+//       .populate({
+//         path: "team",
+//         select: "name title role email",
+//       })
+//       .populate({
+//         path: "activities.by",
+//         select: "name",
+//       });
+
+//     res.status(200).json({
+//       status: true,
+//       task,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(400).json({ status: false, message: error.message });
+//   }
+// };
+
 export const getTask = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Validate ID
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid or missing task ID",
+      });
+    }
+
+    // Find task by ID
     const task = await Task.findById(id)
       .populate({
         path: "team",
@@ -242,15 +276,23 @@ export const getTask = async (req, res) => {
         select: "name",
       });
 
+    if (!task) {
+      return res.status(404).json({
+        status: false,
+        message: "Task not found",
+      });
+    }
+
     res.status(200).json({
       status: true,
       task,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(400).json({ status: false, message: error.message });
+    console.error(error);
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
+
 
 export const createSubTask = async (req, res) => {
   try {
