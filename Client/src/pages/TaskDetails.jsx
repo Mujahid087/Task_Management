@@ -19,6 +19,7 @@ import Tabs from "../components/Tabs";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 import Loading from "../components/Loader";
 import Button from "../components/Button";
+import { useGetSingleTaskQuery } from "../redux/slices/api/TaskApiSlice";
 
 const assets = [
   "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -89,8 +90,17 @@ const act_types = [
 const TaskDetails = () => {
   const { id } = useParams();
 
+  const { data, isLoading } = useGetSingleTaskQuery(id)
+  console.log(data)
   const [selected, setSelected] = useState(0);
-  const task = tasks[3];
+  const task = data?.task;
+
+  if (isLoading) return (
+    <div className="py-10">
+      <Loading />
+
+    </div>
+  )
 
   return (
     <div className='w-full flex flex-col gap-3 mb-4 overflow-y-hidden'>
@@ -121,6 +131,11 @@ const TaskDetails = () => {
                         TASK_TYPE[task.stage]
                       )}
                     />
+                    
+                    {/* <div
+                      className={clsx("w-4 h-4 rounded-full", TASK_TYPE[task.stage])}
+                    /> */}
+
                     <span className='text-black uppercase'>{task?.stage}</span>
                   </div>
                 </div>
@@ -233,7 +248,7 @@ const Activities = ({ activity, id }) => {
   const [text, setText] = useState("");
   const isLoading = false;
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => { };
 
   const Card = ({ item }) => {
     return (
@@ -314,3 +329,8 @@ const Activities = ({ activity, id }) => {
   );
 };
 export default TaskDetails;
+
+
+
+
+
