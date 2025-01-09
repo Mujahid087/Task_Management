@@ -6,13 +6,14 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../UserInfo";
 import Button from "../Button";
 import ConfirmatioDialog from "../Dialogs";
+import { useTrashTaskMutation } from "../../redux/slices/api/TaskApiSlice";
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -24,12 +25,33 @@ const Table = ({ tasks }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  const [trashTask]=useTrashTaskMutation()
+
   const deleteClicks = (id) => {
     setSelected(id);
     setOpenDialog(true);
   };
 
-  const deleteHandler = () => {};
+  const deleteHandler = async () => {
+     try {
+      const result=await trashTask({
+        id:selected,
+        isTrash:"trash",
+      }).unwrap()
+
+      toast.success(result?.message)
+
+      setTimeout(()=>{
+        setOpenDialog(false)
+        window.location.reload();
+      },500)
+      
+     } catch (error) {
+      console.log(error); 
+      toast.error(error?.data?.message || error.error)
+      
+     }
+  };
 
   const TableHeader = () => (
     <thead className='w-full border-b border-gray-300'>
