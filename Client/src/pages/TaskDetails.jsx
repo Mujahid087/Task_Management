@@ -12,14 +12,14 @@ import {
   MdTaskAlt,
 } from "react-icons/md";
 import { RxActivityLog } from "react-icons/rx";
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { tasks } from "../assets/data";
 import Tabs from "../components/Tabs";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 import Loading from "../components/Loader";
 import Button from "../components/Button";
-import { useGetSingleTaskQuery } from "../redux/slices/api/TaskApiSlice";
+import { useGetSingleTaskQuery, usePostTaskActivityMutation } from "../redux/slices/api/TaskApiSlice";
 
 const assets = [
   "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -90,8 +90,8 @@ const act_types = [
 const TaskDetails = () => {
   const { id } = useParams();
 
-  const { data, isLoading } = useGetSingleTaskQuery(id)
-  console.log(data)
+  const { data, isLoading ,refetch} = useGetSingleTaskQuery(id)
+  // console.log(data)
   const [selected, setSelected] = useState(0);
   const task = data?.task;
 
@@ -235,7 +235,7 @@ const TaskDetails = () => {
           </>
         ) : (
           <>
-            <Activities activity={task?.activities} id={id} />
+            <Activities activity={data?.activities} id={id} refetch={refetch} />
           </>
         )}
       </Tabs>
@@ -243,12 +243,33 @@ const TaskDetails = () => {
   );
 };
 
-const Activities = ({ activity, id }) => {
+const Activities = ({ activity, id ,refetch}) => {
   const [selected, setSelected] = useState(act_types[0]);
   const [text, setText] = useState("");
-  const isLoading = false;
+  // const isLoading = false;
+  
+  const [postActivity , {isLoading}]=usePostTaskActivityMutation()
+  const handleSubmit = async () => { 
+    try {
+      const activityData={
+        type:selected?.toLowerCase(),
+        activity:text,
 
-  const handleSubmit = async () => { };
+      }
+      const result=await postActivity({
+        data:activityData,
+        id
+      }).unwrap()
+
+       setText("")
+       toast.success(result?.message)
+       refetch()
+      
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.message || error.error)
+    }
+  };
 
   const Card = ({ item }) => {
     return (

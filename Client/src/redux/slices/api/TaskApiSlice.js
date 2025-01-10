@@ -62,10 +62,28 @@ export const taskApiSlice=apiSlice.injectEndpoints({
                 credentials:"include",
             })
         }),
+        postTaskActivity:builder.mutation({
+            query:({data,id})=>({
+                url:`${TASKS_URL}/activity/${id}`,
+                method:"POST",
+                body:data,
+                credentials:"include",
+            })
+        }),
 
 
     })
 
 })
 
-export const {useGetDashboardStatsQuery,useGetAllTaskQuery,useUpdateTaskMutation,useCreateTaskMutation,useDuplicateTaskMutation,useTrashTaskMutation,useCreateSubTaskMutation,useGetSingleTaskQuery}=taskApiSlice
+export const {
+    useGetDashboardStatsQuery,
+    useGetAllTaskQuery,
+    useUpdateTaskMutation,
+    useCreateTaskMutation,
+    useDuplicateTaskMutation,
+    useTrashTaskMutation,
+    useCreateSubTaskMutation,
+    useGetSingleTaskQuery,
+    usePostTaskActivityMutation
+}=taskApiSlice
