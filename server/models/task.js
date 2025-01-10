@@ -31,7 +31,7 @@ const taskSchema = new Schema(
         activity: String,
         date: { type: Date, default: new Date() },
         by: { type: Schema.Types.ObjectId, ref: "User" },
-      },
+      }
     ],
     
 
