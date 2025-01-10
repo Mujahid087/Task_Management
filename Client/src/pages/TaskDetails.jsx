@@ -94,6 +94,7 @@ const TaskDetails = () => {
   // console.log(data)
   const [selected, setSelected] = useState(0);
   const task = data?.task;
+  console.log(data)
 
   if (isLoading) return (
     <div className="py-10">
@@ -235,7 +236,7 @@ const TaskDetails = () => {
           </>
         ) : (
           <>
-            <Activities activity={data?.activities} id={id} refetch={refetch} />
+            <Activities activity={data?.task?.activities} id={id} refetch={refetch} />
           </>
         )}
       </Tabs>
